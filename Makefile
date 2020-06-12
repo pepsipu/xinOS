@@ -41,4 +41,4 @@ clean:
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 %.asm.o: %.asm
-	$(AS) $< -I . -f elf32 -o $@
+	$(AS) $< -I . -f elf32 -g -o $@
