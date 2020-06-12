@@ -5,7 +5,6 @@
 struct free_chunk
 {
     size_t size;
-    uint32_t region;
     struct free_chunk *fd;
     struct free_chunk *bk;
 };
@@ -27,7 +26,11 @@ typedef struct
 
 region_state_t *fm_regions;
 uint32_t fm_region_len;
-free_chunk_t *free_bin;
+free_chunk_t free_bin = (free_chunk_t) {
+    .size = 0,
+    .fd = &free_bin,
+    .bk = &free_bin,
+};
 
 void init_pmm(multiboot_memory_map_t *mmap_addr, uint32_t mmap_length)
 {
@@ -77,18 +80,18 @@ void *kmalloc(size_t requested_size)
     if (requested_size == 0)
         return NULL;
     // round to nearest multiple of 8 so we get alignment and assert
-    size_t aligned_size = (requested_size + 7) & -8;
+    size_t aligned_size = (requested_size  + sizeof(allocated_chunk_t) + 7) & -8;
     // ensure size is big enough to fit a free chunk
     size_t size = aligned_size < sizeof(free_chunk_t) ? sizeof(free_chunk_t) : aligned_size;
-    free_chunk_t *ptr = free_bin;
-    while (ptr != NULL)
+    free_chunk_t *ptr = free_bin.fd;
+    while (ptr != &free_bin)
         {
             if (ptr->size == size)
             {
                 // unlink from free list
                 ptr->bk->fd = ptr->fd;
                 ptr->fd->bk = ptr->bk;
-                return ptr;
+                return ptr + sizeof(allocated_chunk_t);
             }
             // ensure we can split chunk and still have space for a free chunk
             if (ptr->size > size && ptr->size - size > sizeof(free_chunk_t))
@@ -106,9 +109,19 @@ void *kmalloc(size_t requested_size)
         {
             allocated_chunk_t *new_chunk = region->addr + region->used;
             new_chunk->size = size;
+            region->used += size;
             return &new_chunk->data;
         }
     }
     // uh oh
     return NULL;
+}
+
+void kfree(void *chunk) {
+    free_chunk_t *chunk_to_free = chunk - sizeof(allocated_chunk_t);
+    // link chunk to free list
+    chunk_to_free->bk = free_bin.fd->bk;
+    free_bin.fd->bk = chunk_to_free;
+    chunk_to_free->fd = free_bin.fd;
+    free_bin.fd = chunk_to_free;
 }

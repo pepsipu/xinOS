@@ -9,6 +9,4 @@ void kmain(multiboot_info_t *mb_ptr)
     // copy multiboot information so we don't need to deref a pointer every time we need to access it.
     memcpy(&mb, mb_ptr, sizeof(multiboot_info_t));
     init_pmm(mb.mmap_addr, mb.mmap_length);
-    void *e = kmalloc(10);
-    void *k = kmalloc(30);
 }
