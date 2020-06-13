@@ -11,7 +11,7 @@ struct free_chunk
 
 typedef struct free_chunk free_chunk_t;
 
-typedef struct allocated_chunk
+typedef struct
 {
     size_t size;
     uint8_t data[];
@@ -79,7 +79,7 @@ void *kmalloc(size_t requested_size)
 {
     if (requested_size == 0)
         return NULL;
-    // round to nearest multiple of 8 so we get alignment and assert
+    // round to nearest multiple of 8 so we get alignment
     size_t aligned_size = (requested_size  + sizeof(allocated_chunk_t) + 7) & -8;
     // ensure size is big enough to fit a free chunk
     size_t size = aligned_size < sizeof(free_chunk_t) ? sizeof(free_chunk_t) : aligned_size;
@@ -94,10 +94,11 @@ void *kmalloc(size_t requested_size)
                 return ptr + sizeof(allocated_chunk_t);
             }
             // ensure we can split chunk and still have space for a free chunk
-            if (ptr->size > size && ptr->size - size > sizeof(free_chunk_t))
+            if (ptr->size > size && ptr->size - size - sizeof(allocated_chunk_t) > sizeof(free_chunk_t))
             {
-                ptr->size -= size;
-                return ptr + ptr->size;
+                ptr->size -= size + sizeof(allocated_chunk_t);
+                allocated_chunk_t *new_chunk = ptr + ptr->size + sizeof(allocated_chunk_t);
+                new_chunk->size = size;
             }
             ptr = ptr->fd;
         }
@@ -109,7 +110,7 @@ void *kmalloc(size_t requested_size)
         {
             allocated_chunk_t *new_chunk = region->addr + region->used;
             new_chunk->size = size;
-            region->used += size;
+            region->used += size + sizeof(allocated_chunk_t);
             return &new_chunk->data;
         }
     }
