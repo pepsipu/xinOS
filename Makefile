@@ -1,6 +1,6 @@
 BUILD=build
-CFLAGS=-I src -std=gnu99 -ffreestanding -Wall -Wextra -m32 -fno-pic -g -mno-red-zone -fno-stack-protector
 CC=i386-elf-gcc
+CFLAGS=-I src -std=gnu99 -ffreestanding -Wall -Wextra -m32 -fno-pic -g -mno-red-zone -fno-stack-protector -masm=intel
 AS=nasm
 LD=i386-elf-gcc
 LDFLAGS=-T link.ld -ffreestanding -nostdlib -lgcc -m32

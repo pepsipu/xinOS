@@ -12,4 +12,7 @@ void kmain(multiboot_info_t *mb_ptr)
     memcpy(&mb, mb_ptr, sizeof(multiboot_info_t));
     init_idt();
     init_pmm(mb.mmap_addr, mb.mmap_length);
+    for (int i = 0; i < 30; i++) {
+        kprint("%d", i);
+    }
 }
