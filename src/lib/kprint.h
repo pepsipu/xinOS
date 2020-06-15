@@ -1,0 +1,1 @@
+void kprint(char *format, ...);

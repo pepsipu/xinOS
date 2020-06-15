@@ -2,6 +2,7 @@
 #include <lib/mem.h>
 #include <mm/mm.h>
 #include <sys/idt.h>
+#include <lib/kprint.h>
 
 multiboot_info_t mb;
 

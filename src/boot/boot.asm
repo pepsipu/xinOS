@@ -39,8 +39,6 @@ section .text
         call kmain
         cli
         .hang:
-        mov byte [0xb8000], ':'
-        mov byte [0xb8002], '('
         hlt
         jmp .hang
         .end:
