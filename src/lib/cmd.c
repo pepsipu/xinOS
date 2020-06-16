@@ -11,12 +11,12 @@ cursor_t cursor = {
     .x = 0,
     .y = 0,
 };
-uint16_t rows;
+uint8_t rows;
 uint16_t columns;
 
 void init_cmd() {
     columns = *((uint16_t *) 0x44a);
-    rows = (uint16_t) *((uint8_t *) 0x484);
+    rows = *((uint8_t *) 0x484);
 }
 
 void write_char(uint8_t c, uint8_t fg, uint8_t bg, uint16_t x, uint16_t y)
