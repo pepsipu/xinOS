@@ -9,8 +9,9 @@ CSOURCES=$(shell find . -type f -iname '*.c')
 COBJECTS=$(foreach x, $(basename $(CSOURCES)), $(x).o)
 ASMSOURCES=$(shell find . -type f -iname '*.asm')
 ASMOBJECTS=$(foreach x, $(basename $(ASMSOURCES)), $(x).asm.o)
-BIN=dbos.bin
-ISONAME=dbos.iso
+NAME=xinOS
+BIN=$(NAME).bin
+ISONAME=$(NAME).iso
 
 OBJS=$(COBJECTS) $(ASMOBJECTS)
 

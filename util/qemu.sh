@@ -1,1 +1,1 @@
-make && qemu-system-i386 -cdrom ./build/dbos.iso -s -machine q35 $@
+make && qemu-system-i386 -cdrom ./build/xinOS.iso -s -machine q35 $@

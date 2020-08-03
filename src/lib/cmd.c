@@ -16,6 +16,7 @@ uint16_t columns;
 
 void init_cmd() {
     columns = *((uint16_t *) 0x44a);
+    // cant wait for some chad to pull up with 256 line terminal
     rows = *((uint8_t *) 0x484);
 }
 
