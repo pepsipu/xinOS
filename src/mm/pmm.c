@@ -1,4 +1,5 @@
 #include <boot/multiboot.h>
+#include <lib/mem.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -125,4 +126,12 @@ void kfree(void *chunk) {
     free_bin.fd->bk = chunk_to_free;
     chunk_to_free->fd = free_bin.fd;
     free_bin.fd = chunk_to_free;
+}
+
+void *krealloc(void *chunk, size_t new_size) {
+    void *new_chunk = kmalloc(new_chunk);
+    size_t old_size = *(size_t *)(chunk - sizeof(allocated_chunk_t));
+    memcpy(new_chunk, chunk, old_size > new_size ? old_size - new_size : new_size);
+    kfree(chunk);
+    return new_chunk;
 }

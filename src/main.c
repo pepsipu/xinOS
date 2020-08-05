@@ -19,5 +19,5 @@ void kmain(multiboot_info_t *mb_ptr)
         kprint("your system is far too boomer to support apic, get a better pc lul");
     }
     init_pmm(mb.mmap_addr, mb.mmap_length);
-    kprint("pee: %d", pcic_readw());
+    kprint("test vendor id: %x", pcic_readw(0,0,0,0));
 }
