@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stddef.h>
-
 #include <sys/cpu.h>
 #include <sys/apic.h>
 
@@ -11,4 +10,5 @@ int init_apic()
     cpuid(1, NULL, NULL, NULL, &edx);
     if (!(edx & (1 << 9)))
         return 1;
+    return 0;
 }

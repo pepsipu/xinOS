@@ -5,6 +5,7 @@
 #include <lib/kprint.h>
 #include <sys/apic.h>
 #include <lib/cmd.h>
+#include <sys/pci.h>
 
 multiboot_info_t mb;
 
@@ -18,7 +19,5 @@ void kmain(multiboot_info_t *mb_ptr)
         kprint("your system is far too boomer to support apic, get a better pc lul");
     }
     init_pmm(mb.mmap_addr, mb.mmap_length);
-    for (int i = 0; i < 30; i++) {
-        kprint("%d\n", i);
-    }
+    kprint("pee: %d", pcic_readw());
 }
