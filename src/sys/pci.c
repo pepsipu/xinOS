@@ -1,6 +1,15 @@
 #include <stdint.h>
 #include <lib/io.h>
 #include <sys/pci.h>
+#include <lib/dynll.h>
+#include <lib/mem.h>
+
+typedef struct
+{
+
+} pci_device_t;
+
+new_dynll(pci_devices, pci_device_t);
 
 typedef struct
 {
