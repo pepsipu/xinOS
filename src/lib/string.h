@@ -1,1 +1,1 @@
-char* itoa(int val, int base);
+char *itoa(int val, int base);

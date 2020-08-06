@@ -1,7 +1,7 @@
 #include <boot/multiboot.h>
 #include <lib/mem.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 struct free_chunk
 {
@@ -27,7 +27,7 @@ typedef struct
 
 region_state_t *fm_regions;
 uint32_t fm_region_len;
-free_chunk_t free_bin = (free_chunk_t) {
+free_chunk_t free_bin = (free_chunk_t){
     .size = 0,
     .fd = &free_bin,
     .bk = &free_bin,
@@ -81,28 +81,28 @@ void *kmalloc(size_t requested_size)
     if (requested_size == 0)
         return NULL;
     // round to nearest multiple of 8 so we get alignment
-    size_t aligned_size = (requested_size  + sizeof(allocated_chunk_t) + 7) & -8;
+    size_t aligned_size = (requested_size + sizeof(allocated_chunk_t) + 7) & -8;
     // ensure size is big enough to fit a free chunk
     size_t size = aligned_size < sizeof(free_chunk_t) ? sizeof(free_chunk_t) : aligned_size;
     free_chunk_t *ptr = free_bin.fd;
     while (ptr != &free_bin)
+    {
+        if (ptr->size == size)
         {
-            if (ptr->size == size)
-            {
-                // unlink from free list
-                ptr->bk->fd = ptr->fd;
-                ptr->fd->bk = ptr->bk;
-                return ptr + sizeof(allocated_chunk_t);
-            }
-            // ensure we can split chunk and still have space for a free chunk
-            if (ptr->size > size && ptr->size - size - sizeof(allocated_chunk_t) > sizeof(free_chunk_t))
-            {
-                ptr->size -= size + sizeof(allocated_chunk_t);
-                allocated_chunk_t *new_chunk = ptr + ptr->size + sizeof(allocated_chunk_t);
-                new_chunk->size = size;
-            }
-            ptr = ptr->fd;
+            // unlink from free list
+            ptr->bk->fd = ptr->fd;
+            ptr->fd->bk = ptr->bk;
+            return ptr + sizeof(allocated_chunk_t);
         }
+        // ensure we can split chunk and still have space for a free chunk
+        if (ptr->size > size && ptr->size - size - sizeof(allocated_chunk_t) > sizeof(free_chunk_t))
+        {
+            ptr->size -= size + sizeof(allocated_chunk_t);
+            allocated_chunk_t *new_chunk = ptr + ptr->size + sizeof(allocated_chunk_t);
+            new_chunk->size = size;
+        }
+        ptr = ptr->fd;
+    }
     // if we can't find a free chunk, we can make a new chunk from the memory regions
     for (int i = 0; i < fm_region_len; i++)
     {
@@ -119,7 +119,8 @@ void *kmalloc(size_t requested_size)
     return NULL;
 }
 
-void kfree(void *chunk) {
+void kfree(void *chunk)
+{
     free_chunk_t *chunk_to_free = chunk - sizeof(allocated_chunk_t);
     // link chunk to free list
     chunk_to_free->bk = free_bin.fd->bk;
@@ -128,7 +129,8 @@ void kfree(void *chunk) {
     free_bin.fd = chunk_to_free;
 }
 
-void *krealloc(void *chunk, size_t new_size) {
+void *krealloc(void *chunk, size_t new_size)
+{
     void *new_chunk = kmalloc(new_chunk);
     size_t old_size = *(size_t *)(chunk - sizeof(allocated_chunk_t));
     memcpy(new_chunk, chunk, old_size > new_size ? old_size - new_size : new_size);

@@ -1,7 +1,7 @@
-#include <stdint.h>
 #include <stddef.h>
-#include <sys/cpu.h>
+#include <stdint.h>
 #include <sys/apic.h>
+#include <sys/cpu.h>
 
 int init_apic()
 {
