@@ -27,7 +27,7 @@
     name##_dynll.bk = new_node; \
 })
 
-#define search_dynll_element(name, condition) ({ \
+#define search_dynll_ptr(name, condition) ({ \
     name##_dynll_node_t *ptr; \
     for (ptr = name##_dynll.fd; ptr != &name##_dynll; ptr = ptr->fd) { \
         if (condition) \
