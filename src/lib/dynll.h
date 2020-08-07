@@ -53,3 +53,12 @@
     ret:                                                                                                               \
         ptr;                                                                                                           \
     })
+
+#define iter_dynll(name, cb)                                                                                           \
+    ({                                                                                                                 \
+        name##_dynll_node_t *ptr;                                                                                      \
+        for (ptr = name##_dynll.fd; ptr != &name##_dynll; ptr = ptr->fd)                                               \
+        {                                                                                                              \
+            cb(&ptr->data);                                                                                            \
+        }                                                                                                              \
+    })
