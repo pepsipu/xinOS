@@ -6,6 +6,9 @@
 
 typedef struct
 {
+    uint8_t multi_function;
+    uint16_t vendor;
+    uint16_t device;
 } pci_slot_t;
 
 new_dynll(pci_slots, pci_slot_t);
@@ -31,7 +34,7 @@ uint32_t pcic_readd(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset)
 {
     // calculate address for config_address & ensure enable bit is set (bit 31)
     uint32_t address = (uint32_t)(((uint32_t)bus << 16) | ((uint32_t)slot << 11) | ((uint32_t)func << 8) |
-                                  (offset & 0xfc) | ((uint32_t)0x80000000));
+        (offset & 0xfc) | ((uint32_t)0x80000000));
     // config_address_u address;
     // address.s = (config_address_t){
     //     offset & 0xfc,
@@ -60,6 +63,7 @@ void enumerate_pci_slots_from_bus(uint8_t bus)
         uint16_t vendor = pcic_read(bus, slot, 0, 0, uint16_t);
         if (vendor == 0xffff)
             continue;
+        append_dynll(pci_slots, {});
     }
 }
 
