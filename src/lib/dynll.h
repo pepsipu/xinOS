@@ -4,11 +4,12 @@
 // k level circular doubly linked list for generic use
 
 #define new_dynll(name, type)                                                                                          \
+    typedef type name##_dynll_element_t;                                                                               \
     struct name##_dynll_node                                                                                           \
     {                                                                                                                  \
         struct name##_dynll_node *fd;                                                                                  \
         struct name##_dynll_node *bk;                                                                                  \
-        type data;                                                                                                     \
+        name##_dynll_element_t data;                                                                                   \
     };                                                                                                                 \
     typedef struct name##_dynll_node name##_dynll_node_t;                                                              \
     name##_dynll_node_t name##_dynll = {&name##_dynll, &name##_dynll}
@@ -41,17 +42,20 @@
         name##_dynll.bk = new_node;                                                                                    \
     })
 
-#define search_dynll_ptr(name, condition)                                                                              \
+#define search_dynll(name, condition)                                                                                  \
     ({                                                                                                                 \
         name##_dynll_node_t *ptr;                                                                                      \
+        name##_dynll_element_t *ret = 0;                                                                               \
         for (ptr = name##_dynll.fd; ptr != &name##_dynll; ptr = ptr->fd)                                               \
         {                                                                                                              \
+            name##_dynll_element_t *element = &ptr->data;                                                              \
             if (condition)                                                                                             \
-                goto ret;                                                                                              \
+            {                                                                                                          \
+                ret = element;                                                                                         \
+                break;                                                                                                 \
+            }                                                                                                          \
         }                                                                                                              \
-        ptr = 0;                                                                                                       \
-    ret:                                                                                                               \
-        ptr;                                                                                                           \
+        ret;                                                                                                           \
     })
 
 #define iter_dynll(name, cb)                                                                                           \
