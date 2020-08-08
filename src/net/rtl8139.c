@@ -1,3 +1,5 @@
+#include <lib/dynll.h>
+#include <net/rtl8139.h>
 #include <sys/pci.h>
 
 #define RT_VENDOR 0x10ec

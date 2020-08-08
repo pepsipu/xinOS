@@ -3,6 +3,7 @@
 #include <lib/kprint.h>
 #include <lib/mem.h>
 #include <mm/mm.h>
+#include <net/rtl8139.h>
 #include <sys/apic.h>
 #include <sys/idt.h>
 #include <sys/pci.h>

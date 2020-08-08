@@ -3,7 +3,9 @@
 
 // k level circular doubly linked list for generic use
 
-#define new_dynll(name, type)                                                                                          \
+#define new_dynll(name) name##_dynll_node_t name##_dynll = {&name##_dynll, &name##_dynll}
+
+#define new_type_dynll(name, type)                                                                                     \
     typedef type name##_dynll_element_t;                                                                               \
     struct name##_dynll_node                                                                                           \
     {                                                                                                                  \
@@ -12,7 +14,7 @@
         name##_dynll_element_t data;                                                                                   \
     };                                                                                                                 \
     typedef struct name##_dynll_node name##_dynll_node_t;                                                              \
-    name##_dynll_node_t name##_dynll = {&name##_dynll, &name##_dynll}
+    name##_dynll_node_t name##_dynll
 
 #define prepend_dynll(name, element)                                                                                   \
     ({                                                                                                                 \

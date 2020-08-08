@@ -5,21 +5,7 @@
 #include <stdint.h>
 #include <sys/pci.h>
 
-// typedef struct
-// {
-//     uint8_t offset: 8;
-//     uint8_t func: 3;
-//     uint8_t slot: 5;
-//     uint8_t bus: 8;
-//     uint8_t resv: 7;
-//     uint8_t enable: 1;
-// } __attribute__((packed)) config_address_t;
-
-// typedef union
-// {
-//     config_address_t s;
-//     uint32_t i;
-// } config_address_u;
+new_dynll(pci_functions);
 
 // read dword from pci config
 uint32_t pcic_readd(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset)
@@ -27,24 +13,9 @@ uint32_t pcic_readd(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset)
     // calculate address for config_address & ensure enable bit is set (bit 31)
     uint32_t address = (uint32_t)(((uint32_t)bus << 16) | ((uint32_t)slot << 11) | ((uint32_t)func << 8) |
                                   (offset & 0xfc) | ((uint32_t)0x80000000));
-    // config_address_u address;
-    // address.s = (config_address_t){
-    //     offset & 0xfc,
-    //     func,
-    //     slot,
-    //     bus,
-    //     0,
-    //     1
-    // };
     outd(0xcf8, address);
     return ind(0xcfc);
 }
-
-// uint16_t pcic_readw(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset)
-// {
-//     return (uint16_t)(pcic_readd(bus, slot, func, offset) >> ((offset & 2) *
-//     8));
-// }
 
 // given a bus, recusively scan for secondary buses to enumerate all possible
 // buses
@@ -105,15 +76,14 @@ void handle_pci_function(uint8_t bus, uint8_t slot, uint8_t func)
                                    pcic_read(bus, slot, func, 2, uint16_t)}));
 }
 
-// void print_devices_debug(pci_function_t *ptr)
-// {
-//     kprint("Bus: %x Slot: %x Func: %x Class: %x Subclass: %x Vendor: %x Device: %x\n", ptr->bus, ptr->slot,
-//     ptr->func,
-//            ptr->class, ptr->subclass, ptr->vendor, ptr->device);
-// }
+void print_devices_debug(pci_function_t *ptr)
+{
+    kprint("Bus: %x Slot: %x Func: %x Class: %x Subclass: %x Vendor: %x Device: %x\n", ptr->bus, ptr->slot, ptr->func,
+           ptr->class, ptr->subclass, ptr->vendor, ptr->device);
+}
 
 void init_pci()
 {
     enumerate_pci_slots();
-    // iter_dynll(pci_functions, print_devices_debug);
+    iter_dynll(pci_functions, print_devices_debug);
 }
