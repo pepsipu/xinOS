@@ -8,13 +8,20 @@
 new_dynll(pci_functions);
 
 // read dword from pci config
+
 uint32_t pcic_readd(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset)
 {
     // calculate address for config_address & ensure enable bit is set (bit 31)
-    uint32_t address = (uint32_t)(((uint32_t)bus << 16) | ((uint32_t)slot << 11) | ((uint32_t)func << 8) |
-                                  (offset & 0xfc) | ((uint32_t)0x80000000));
+    uint32_t address = pcic_address(bus, slot, func, offset);
     outd(0xcf8, address);
     return ind(0xcfc);
+}
+
+void pcic_writed(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint32_t value)
+{
+    uint32_t address = pcic_address(bus, slot, func, offset);
+    outd(0xcf8, address);
+    outd(0xcfc, value);
 }
 
 // given a bus, recusively scan for secondary buses to enumerate all possible
@@ -86,4 +93,25 @@ void init_pci()
 {
     enumerate_pci_slots();
     iter_dynll(pci_functions, print_devices_debug);
+}
+
+void read_pci_bar(pci_function_t *device, uint8_t bar_idx)
+{
+    uint32_t bar = pcic_read(device->bus, device->slot, device->func, 16 + bar_idx * 4, uint32_t);
+    uint8_t type = bar & 1;
+    device->bars[bar_idx].type = type;
+    if (type)
+    {
+        // this is an io space bar
+    }
+    else
+    {
+        // this is a mem space bar
+    }
+}
+
+void enable_pci_bus_mastering(pci_function_t *device)
+{
+    pcic_writed(device->bus, device->slot, device->func, 4,
+                pcic_readd(device->bus, device->slot, device->func, 4) | (1 << 2));
 }

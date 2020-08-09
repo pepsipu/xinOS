@@ -15,6 +15,7 @@ pci_function_t *get_rtl8139()
 int init_rtl8139()
 {
     pci_rtl8139 = get_rtl8139();
+    enable_pci_bus_mastering(pci_rtl8139);
     if (!pci_rtl8139)
     {
         return 1;
