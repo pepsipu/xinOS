@@ -31,5 +31,5 @@ void init_idt()
     idt_ptr.addr = (uint32_t)idt;
     memset(idt, 0, sizeof(idt));
     asm volatile("lidt %0" : : "m"(idt_ptr));
-    asm volatile("sti");
+    // asm volatile("sti");
 };

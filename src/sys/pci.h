@@ -32,4 +32,5 @@ new_type_dynll(pci_functions, pci_function_t);
 uint32_t pcic_readd(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset);
 void pcic_writed(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint32_t value);
 void enable_pci_bus_mastering(pci_function_t *device);
+void read_pci_bar(pci_function_t *device, uint8_t bar_idx);
 void init_pci();

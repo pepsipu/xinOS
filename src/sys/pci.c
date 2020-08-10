@@ -97,16 +97,21 @@ void init_pci()
 
 void read_pci_bar(pci_function_t *device, uint8_t bar_idx)
 {
+    pci_bar_t bar_device = device->bars[bar_idx];
     uint32_t bar = pcic_read(device->bus, device->slot, device->func, 16 + bar_idx * 4, uint32_t);
-    uint8_t type = bar & 1;
-    device->bars[bar_idx].type = type;
-    if (type)
+    bar_device.type = bar & 1;
+    if (bar_device.type)
     {
         // this is an io space bar
+        bar_device.addr = bar & 0xfffffffc;
     }
     else
     {
         // this is a mem space bar
+        // for the sake of my sanity ignore 64 bit bars
+        bar_device.mem_type = (bar & 0xe) >> 1;
+        bar_device.prefetch = (bar & 0x7) >> 3;
+        bar_device.addr = bar & 0xfffffff0;
     }
 }
 

@@ -22,4 +22,5 @@ void kmain(multiboot_info_t *mb_ptr)
     }
     init_pmm(mb.mmap_addr, mb.mmap_length);
     init_pci();
+    init_rtl8139();
 }
