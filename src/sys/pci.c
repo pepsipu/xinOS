@@ -78,9 +78,13 @@ void handle_pci_function(uint8_t bus, uint8_t slot, uint8_t func)
                pcic_read(bus, slot, func, 19, uint8_t));
         enumerate_pci_slots_from_bus(pcic_read(bus, slot, func, 19, uint8_t));
     }
-    append_dynll(pci_functions,
-                 ((pci_function_t){bus, slot, func, class, subclass, pcic_read(bus, slot, func, 0, uint16_t),
-                                   pcic_read(bus, slot, func, 2, uint16_t)}));
+    append_dynll(pci_functions, ((pci_function_t){.bus = bus,
+                                                  .slot = slot,
+                                                  .func = func,
+                                                  .class = class,
+                                                  .subclass = subclass,
+                                                  .vendor = pcic_read(bus, slot, func, 0, uint16_t),
+                                                  .device = pcic_read(bus, slot, func, 2, uint16_t)}));
 }
 
 void print_devices_debug(pci_function_t *ptr)
@@ -97,21 +101,21 @@ void init_pci()
 
 void read_pci_bar(pci_function_t *device, uint8_t bar_idx)
 {
-    pci_bar_t bar_device = device->bars[bar_idx];
+    pci_bar_t *bar_device = &device->bars[bar_idx];
     uint32_t bar = pcic_read(device->bus, device->slot, device->func, 16 + bar_idx * 4, uint32_t);
-    bar_device.type = bar & 1;
-    if (bar_device.type)
+    bar_device->type = bar & 1;
+    if (bar_device->type)
     {
         // this is an io space bar
-        bar_device.addr = bar & 0xfffffffc;
+        bar_device->addr = bar & 0xfffffffc;
     }
     else
     {
         // this is a mem space bar
         // for the sake of my sanity ignore 64 bit bars
-        bar_device.mem_type = (bar & 0xe) >> 1;
-        bar_device.prefetch = (bar & 0x7) >> 3;
-        bar_device.addr = bar & 0xfffffff0;
+        bar_device->mem_type = (bar & 0xe) >> 1;
+        bar_device->prefetch = (bar & 0x7) >> 3;
+        bar_device->addr = bar & 0xfffffff0;
     }
 }
 

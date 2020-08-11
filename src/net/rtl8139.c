@@ -7,9 +7,9 @@
 #define RT_VENDOR 0x10ec
 #define RT_DEVICE 0x8139
 
-#define rtl_wb(reg, val) outb(io_offset + (reg), val)
-#define rtl_ww(reg, val) outw(io_offset + (reg), val)
-#define rtl_wd(reg, val) outd(io_offset + (reg), val)
+#define rtl_wb(reg, val) outb(io_offset + (reg), (val))
+#define rtl_ww(reg, val) outw(io_offset + (reg), (val))
+#define rtl_wd(reg, val) outd(io_offset + (reg), (val))
 
 #define rtl_rb(reg) inb(io_offset + (reg))
 #define rtl_rw(reg) inw(io_offset + (reg))
@@ -17,14 +17,25 @@
 
 enum rtl_regs
 {
-    CONFIG0 = 0x51,
+    IDR1 = 0x0,
+    IDR4 = 0x4,
+    CONFIG1 = 0x52,
     CR = 0x37,
     RBSTART = 0x30,
+    RCR = 0x44,
 };
 
 enum cmd_bits
 {
-    CMD_RST = (1 << 4),
+    CMD_RST = 1 << 4,
+};
+
+enum rx_config_bits
+{
+    RXC_AAP = 1 << 0,
+    RXC_APM = 1 << 1,
+    RXC_AM = 1 << 2,
+    RXC_AB = 1 << 3,
 };
 
 struct
@@ -33,8 +44,8 @@ struct
 } nic;
 
 pci_function_t *pci_rtl8139 = 0;
-uint32_t io_offset;
-uint8_t rx_buf[8208];
+uint32_t io_offset = 0;
+uint8_t rx_buf[8208] = {0};
 
 pci_function_t *get_rtl8139()
 {
@@ -55,13 +66,22 @@ int init_rtl8139()
     read_pci_bar(pci_rtl8139, 0);
     io_offset = pci_rtl8139->bars[0].addr;
     // set lwake & lwptn high to power on device
-    rtl_wb(CONFIG0, 0);
+    rtl_wb(CONFIG1, 0);
     // clear tx & rx with software reset
     rtl_wb(CR, CMD_RST);
     // wait for software reset to finish
-    while (!(rtl_rb(CR) & CMD_RST))
+    while (rtl_rb(CR) & CMD_RST)
     {
     }
-    // configure rx buffer
+    nic.mac = (uint64_t)rtl_rd(IDR1) | (((uint64_t)rtl_rw(IDR4)) << 32);
+    // kprint("mac: %x:", nic.mac & 0xff);
+    // kprint("%x:", (nic.mac >> 8) & 0xff);
+    // kprint("%x:", (nic.mac >> 2 * 8) & 0xff);
+    // kprint("%x:", (nic.mac >> 3 * 8) & 0xff);
+    // kprint("%x:", (nic.mac >> 4 * 8) & 0xff);
+    // kprint("%x\n", (nic.mac >> 5 * 8) & 0xff);
+    // set rx buffer
     rtl_wd(RBSTART, rx_buf);
+    // configure rx to take all, broadcast, multicast, & physical packets
+    rtl_wd(RCR, RXC_AAP | RXC_AB | RXC_AM | RXC_APM);
 }
