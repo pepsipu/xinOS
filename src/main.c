@@ -4,7 +4,6 @@
 #include <lib/mem.h>
 #include <mm/mm.h>
 #include <net/rtl8139.h>
-#include <sys/apic.h>
 #include <sys/idt.h>
 #include <sys/pci.h>
 
@@ -16,10 +15,6 @@ void kmain(multiboot_info_t *mb_ptr)
     memcpy(&mb, mb_ptr, sizeof(multiboot_info_t));
     init_cmd();
     init_idt();
-    if (init_apic())
-    {
-        kprint("your system is far too boomer to support apic, get a better pc lul");
-    }
     init_pmm(mb.mmap_addr, mb.mmap_length);
     init_pci();
     init_rtl8139();
