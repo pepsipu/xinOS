@@ -26,3 +26,5 @@
         asm volatile("in eax, dx" : "=a"(value) : "d"(port) :);                                                        \
         value;                                                                                                         \
     })
+
+#define io_wait() asm volatile("outb %%al, $0x80" : : "a"(0))
