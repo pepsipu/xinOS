@@ -1,4 +1,5 @@
 #include <lib/io.h>
+#include <lib/kprint.h>
 #include <sys/pic.h>
 
 enum pic_regs
@@ -17,10 +18,6 @@ enum icw1_bits
 
 void remap_pic(uint8_t offset)
 {
-    // save interrupt masks
-    uint8_t master_imr = inb(MASTER_DATA);
-    uint8_t slave_imr = inb(SLAVE_DATA);
-
     // stage 1: start init and tell pic to prep for 4th stage
     outb(MASTER_CMD, ICW1_INIT | ICW1_PREP_IC4);
     io_wait();
@@ -47,7 +44,43 @@ void remap_pic(uint8_t offset)
     outb(SLAVE_DATA, 1);
     io_wait();
 
-    // restore interrupt masks
-    outb(MASTER_DATA, master_imr);
-    outb(SLAVE_DATA, slave_imr);
+    // set interrupt masks so no interrupts by default
+    outb(MASTER_DATA, 0xff);
+    outb(SLAVE_DATA, 0xff);
+}
+
+void init_pic()
+{
+    // good place so it wont conflict with cpu faults
+    remap_pic(0x20);
+}
+
+void set_imr(uint8_t irq)
+{
+    uint8_t port;
+    if (irq < 8)
+    {
+        port = MASTER_DATA;
+    }
+    else
+    {
+        port = SLAVE_DATA;
+        irq -= 8;
+    }
+    outb(port, inb(port) | (1 << irq));
+}
+
+void clear_imr(uint8_t irq)
+{
+    uint8_t port;
+    if (irq < 8)
+    {
+        port = MASTER_DATA;
+    }
+    else
+    {
+        port = SLAVE_DATA;
+        irq -= 8;
+    }
+    outb(port, inb(port) & ~(1 << irq));
 }

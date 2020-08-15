@@ -1,4 +1,5 @@
 #include <lib/io.h>
+#include <stdint.h>
 
 #define pic_eoi(irq)                                                                                                   \
     ({                                                                                                                 \
@@ -8,3 +9,6 @@
         }                                                                                                              \
         outb(MASTER_CMD, 0x20);                                                                                        \
     })
+
+void remap_pic(uint8_t offset);
+void init_pic();

@@ -27,4 +27,4 @@
         value;                                                                                                         \
     })
 
-#define io_wait() asm volatile("outb %%al, $0x80" : : "a"(0))
+#define io_wait() outb(0x80, 0)
