@@ -131,7 +131,7 @@ void kfree(void *chunk)
 
 void *krealloc(void *chunk, size_t new_size)
 {
-    void *new_chunk = kmalloc(new_chunk);
+    void *new_chunk = kmalloc(new_size);
     size_t old_size = *(size_t *)(chunk - sizeof(allocated_chunk_t));
     memcpy(new_chunk, chunk, old_size > new_size ? old_size - new_size : new_size);
     kfree(chunk);

@@ -16,6 +16,12 @@ enum icw1_bits
     ICW1_INIT = 1 << 4,
 };
 
+enum pic_interrupts
+{
+    PIC_TIMER = 1 << 0,
+    PIC_KEYBOARD = 1 << 1,
+};
+
 void remap_pic(uint8_t offset)
 {
     // stage 1: start init and tell pic to prep for 4th stage
@@ -53,34 +59,31 @@ void init_pic()
 {
     // good place so it wont conflict with cpu faults
     remap_pic(0x20);
+    clear_imrs(PIC_KEYBOARD);
 }
 
-void set_imr(uint8_t irq)
+void set_imrs(uint16_t irqs)
 {
-    uint8_t port;
-    if (irq < 8)
-    {
-        port = MASTER_DATA;
-    }
-    else
-    {
-        port = SLAVE_DATA;
-        irq -= 8;
-    }
-    outb(port, inb(port) | (1 << irq));
 }
 
-void clear_imr(uint8_t irq)
+void clear_imrs(uint16_t irqs)
 {
-    uint8_t port;
-    if (irq < 8)
+    for (uint8_t i = 0; i < 16; ++i)
     {
-        port = MASTER_DATA;
+        uint16_t irq = irqs & (1 << i);
+        uint8_t tmp = i;
+        uint8_t port;
+        if (!irq)
+            continue;
+        if (tmp < 8)
+        {
+            port = MASTER_DATA;
+        }
+        else
+        {
+            port = SLAVE_DATA;
+            tmp -= 8;
+        }
+        outb(port, inb(port) & ~(1 << tmp));
     }
-    else
-    {
-        port = SLAVE_DATA;
-        irq -= 8;
-    }
-    outb(port, inb(port) & ~(1 << irq));
 }

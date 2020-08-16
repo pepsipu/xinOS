@@ -1,9 +1,9 @@
 BUILD=build
 CC=i386-elf-gcc
-CFLAGS=-I src -std=gnu99 -ffreestanding -Wall -Wextra -m32 -fno-pic -g -mno-red-zone -fno-stack-protector -masm=intel
+CFLAGS=-I src -std=gnu99 -ffreestanding -Wall -Wextra -m32 -fno-pic -g -mgeneral-regs-only -mno-red-zone -fno-stack-protector -masm=intel
 AS=nasm
 LD=i386-elf-gcc
-LDFLAGS=-T link.ld -ffreestanding -nostdlib -lgcc -m32
+LDFLAGS=-T link.ld -ffreestanding -nostdlib -m32
 
 CSOURCES=$(shell find . -type f -iname '*.c')
 COBJECTS=$(foreach x, $(basename $(CSOURCES)), $(x).o)
@@ -36,7 +36,6 @@ $(BIN): $(COBJECTS) $(ASMOBJECTS)
 clean:
 	rm $(OBJS)
 	rm -r $(BUILD)
-	rm $(BIN)
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
