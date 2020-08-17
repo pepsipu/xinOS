@@ -1,5 +1,6 @@
 #include <lib/mem.h>
 #include <stdint.h>
+#include <sys/exceptions.h>
 
 struct
 {
@@ -31,4 +32,5 @@ void init_idt()
     idt_ptr.addr = (uint32_t)idt;
     memset(idt, 0, sizeof(idt));
     asm volatile("lidt %0" : : "m"(idt_ptr));
+    register_isr(exc_double_fault, 8);
 };

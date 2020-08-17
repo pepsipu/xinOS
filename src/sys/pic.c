@@ -64,6 +64,24 @@ void init_pic()
 
 void set_imrs(uint16_t irqs)
 {
+    for (uint8_t i = 0; i < 16; ++i)
+    {
+        uint16_t irq = irqs & (1 << i);
+        uint8_t tmp = i;
+        uint8_t port;
+        if (!irq)
+            continue;
+        if (tmp < 8)
+        {
+            port = MASTER_DATA;
+        }
+        else
+        {
+            port = SLAVE_DATA;
+            tmp -= 8;
+        }
+        outb(port, inb(port) | (1 << tmp));
+    }
 }
 
 void clear_imrs(uint16_t irqs)
