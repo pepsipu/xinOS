@@ -87,16 +87,17 @@ void handle_pci_function(uint8_t bus, uint8_t slot, uint8_t func)
                                                   .device = pcic_read(bus, slot, func, 2, uint16_t)}));
 }
 
-void print_devices_debug(pci_function_t *ptr)
-{
-    kprint("Bus: %x Slot: %x Func: %x Class: %x Subclass: %x Vendor: %x Device: %x\n", ptr->bus, ptr->slot, ptr->func,
-           ptr->class, ptr->subclass, ptr->vendor, ptr->device);
-}
+// void print_devices_debug(pci_function_t *ptr)
+// {
+//     kprint("Bus: %x Slot: %x Func: %x Class: %x Subclass: %x Vendor: %x Device: %x\n", ptr->bus, ptr->slot,
+//     ptr->func,
+//            ptr->class, ptr->subclass, ptr->vendor, ptr->device);
+// }
 
 void init_pci()
 {
     enumerate_pci_slots();
-    iter_dynll(pci_functions, print_devices_debug);
+    // iter_dynll(pci_functions, print_devices_debug);
 }
 
 void read_pci_bar(pci_function_t *device, uint8_t bar_idx)
@@ -123,4 +124,9 @@ void enable_pci_bus_mastering(pci_function_t *device)
 {
     pcic_writed(device->bus, device->slot, device->func, 4,
                 pcic_readd(device->bus, device->slot, device->func, 4) | (1 << 2));
+}
+
+void get_interrupt_line(pci_function_t *device)
+{
+    device->interrupt_line = pcic_read(device->bus, device->slot, device->func, 0x3c, uint8_t);
 }

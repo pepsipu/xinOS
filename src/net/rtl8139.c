@@ -2,7 +2,9 @@
 #include <lib/io.h>
 #include <lib/kprint.h>
 #include <net/rtl8139.h>
+#include <sys/idt.h>
 #include <sys/pci.h>
+#include <sys/pic.h>
 
 #define RT_VENDOR 0x10ec
 #define RT_DEVICE 0x8139
@@ -27,6 +29,8 @@ enum rtl_regs
 
 enum cmd_bits
 {
+    CMD_TE = 1 << 2,
+    CMD_RE = 1 << 3,
     CMD_RST = 1 << 4,
 };
 
@@ -41,7 +45,7 @@ enum rx_config_bits
 struct
 {
     uint64_t mac;
-} nic;
+} nic = {0};
 
 pci_function_t *pci_rtl8139 = 0;
 uint32_t io_offset = 0;
@@ -53,6 +57,11 @@ pci_function_t *get_rtl8139()
         return search_dynll(pci_functions, element->device == RT_DEVICE && element->vendor == RT_VENDOR);
     else
         return pci_rtl8139;
+}
+
+void rtl_interrupt()
+{
+    kprint("epic interrupt for rtl");
 }
 
 int init_rtl8139()
@@ -74,14 +83,12 @@ int init_rtl8139()
     {
     }
     nic.mac = (uint64_t)rtl_rd(IDR1) | (((uint64_t)rtl_rw(IDR4)) << 32);
-    // kprint("mac: %x:", nic.mac & 0xff);
-    // kprint("%x:", (nic.mac >> 8) & 0xff);
-    // kprint("%x:", (nic.mac >> 2 * 8) & 0xff);
-    // kprint("%x:", (nic.mac >> 3 * 8) & 0xff);
-    // kprint("%x:", (nic.mac >> 4 * 8) & 0xff);
-    // kprint("%x\n", (nic.mac >> 5 * 8) & 0xff);
     // set rx buffer
     rtl_wd(RBSTART, rx_buf);
     // configure rx to take all, broadcast, multicast, & physical packets
     rtl_wd(RCR, RXC_AAP | RXC_AB | RXC_AM | RXC_APM);
+    // enable rx and tx
+    rtl_wb(CR, CMD_RE | CMD_TE);
+    get_interrupt_line(pci_rtl8139);
+    register_isr(rtl_interrupt, PIC_OFFSET + pci_rtl8139->interrupt_line);
 }

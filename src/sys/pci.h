@@ -24,6 +24,7 @@ typedef struct
     uint8_t subclass;
     uint16_t vendor;
     uint16_t device;
+    uint8_t interrupt_line;
     pci_bar_t bars[6];
 } pci_function_t;
 
@@ -34,3 +35,4 @@ void pcic_writed(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset, uint32
 void enable_pci_bus_mastering(pci_function_t *device);
 void read_pci_bar(pci_function_t *device, uint8_t bar_idx);
 void init_pci();
+void get_interrupt_line(pci_function_t *device);

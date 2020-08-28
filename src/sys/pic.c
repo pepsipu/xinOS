@@ -58,7 +58,7 @@ void remap_pic(uint8_t offset)
 void init_pic()
 {
     // good place so it wont conflict with cpu faults
-    remap_pic(0x20);
+    remap_pic(PIC_OFFSET);
     clear_imrs(PIC_KEYBOARD);
 }
 

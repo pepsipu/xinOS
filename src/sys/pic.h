@@ -1,6 +1,8 @@
 #include <lib/io.h>
 #include <stdint.h>
 
+#define PIC_OFFSET 0x20
+
 #define pic_eoi(irq)                                                                                                   \
     ({                                                                                                                 \
         if (irq >= 8)                                                                                                  \
