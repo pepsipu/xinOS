@@ -1,8 +1,8 @@
-#include <lib/dynll.h>
-#include <lib/io.h>
 #include <lib/kprint.h>
+#include <lib/mem/dynll.h>
 #include <net/rtl8139.h>
 #include <sys/idt.h>
+#include <sys/io.h>
 #include <sys/pci.h>
 #include <sys/pic.h>
 
@@ -83,12 +83,12 @@ int init_rtl8139()
     {
     }
     nic.mac = (uint64_t)rtl_rd(IDR1) | (((uint64_t)rtl_rw(IDR4)) << 32);
+    get_interrupt_line(pci_rtl8139);
+    register_isr(rtl_interrupt, PIC_OFFSET + pci_rtl8139->interrupt_line);
     // set rx buffer
     rtl_wd(RBSTART, rx_buf);
     // configure rx to take all, broadcast, multicast, & physical packets
     rtl_wd(RCR, RXC_AAP | RXC_AB | RXC_AM | RXC_APM);
     // enable rx and tx
     rtl_wb(CR, CMD_RE | CMD_TE);
-    get_interrupt_line(pci_rtl8139);
-    register_isr(rtl_interrupt, PIC_OFFSET + pci_rtl8139->interrupt_line);
 }

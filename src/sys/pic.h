@@ -1,5 +1,5 @@
-#include <lib/io.h>
 #include <stdint.h>
+#include <sys/io.h>
 
 #define PIC_OFFSET 0x20
 

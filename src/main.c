@@ -1,7 +1,7 @@
 #include <boot/multiboot.h>
 #include <lib/cmd.h>
 #include <lib/kprint.h>
-#include <lib/mem.h>
+#include <lib/mem/mem.h>
 #include <mm/mm.h>
 #include <net/rtl8139.h>
 #include <sys/cpu.h>

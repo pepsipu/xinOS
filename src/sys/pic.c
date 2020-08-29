@@ -1,5 +1,5 @@
-#include <lib/io.h>
 #include <lib/kprint.h>
+#include <sys/io.h>
 #include <sys/pic.h>
 
 enum pic_regs

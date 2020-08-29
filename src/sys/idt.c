@@ -1,4 +1,4 @@
-#include <lib/mem.h>
+#include <lib/mem/mem.h>
 #include <stdint.h>
 #include <sys/exceptions.h>
 

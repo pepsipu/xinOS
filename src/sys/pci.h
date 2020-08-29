@@ -1,4 +1,4 @@
-#include <lib/dynll.h>
+#include <lib/mem/dynll.h>
 #include <stdint.h>
 
 #define pcic_address(bus, slot, func, offset)                                                                          \

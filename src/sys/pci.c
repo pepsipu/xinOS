@@ -1,8 +1,8 @@
-#include <lib/dynll.h>
-#include <lib/io.h>
 #include <lib/kprint.h>
-#include <lib/mem.h>
+#include <lib/mem/dynll.h>
+#include <lib/mem/mem.h>
 #include <stdint.h>
+#include <sys/io.h>
 #include <sys/pci.h>
 
 new_dynll(pci_functions);
