@@ -1,5 +1,5 @@
 #include <boot/multiboot.h>
-#include <lib/mem.h>
+#include <lib/mem/mem.h>
 #include <stddef.h>
 #include <stdint.h>
 

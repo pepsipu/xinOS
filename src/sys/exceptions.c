@@ -43,10 +43,5 @@ __attribute__((interrupt)) void exc_double_fault(interrupt_frame_t *frame)
     kprint("flags: %x\n", frame->flags);
     kprint("ip: %x\n", frame->ip);
     kprint("cs: %x\n", frame->cs);
-
-    cli();
-    while (1)
-    {
-        hlt();
-    }
+    hang();
 }
