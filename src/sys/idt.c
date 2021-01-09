@@ -1,6 +1,7 @@
 #include <lib/mem/mem.h>
 #include <stdint.h>
 #include <sys/exceptions.h>
+#include <sys/handlers.h>
 
 struct
 {
@@ -33,4 +34,6 @@ void init_idt()
     memset(idt, 0, sizeof(idt));
     asm volatile("lidt %0" : : "m"(idt_ptr));
     register_isr(exc_double_fault, 8);
+    register_isr(null_handler, 32); // IMPLEMENT, clock
+    register_isr(null_handler, 33); // IMPLEMENT, keyboard
 };
