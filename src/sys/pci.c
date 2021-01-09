@@ -5,6 +5,8 @@
 #include <sys/io.h>
 #include <sys/pci.h>
 
+#define PRINT_DEBUG_DEVICES 0
+
 new_dynll(pci_functions);
 
 // read dword from pci config
@@ -87,17 +89,22 @@ void handle_pci_function(uint8_t bus, uint8_t slot, uint8_t func)
                                                   .device = pcic_read(bus, slot, func, 2, uint16_t)}));
 }
 
-// void print_devices_debug(pci_function_t *ptr)
-// {
-//     kprint("Bus: %x Slot: %x Func: %x Class: %x Subclass: %x Vendor: %x Device: %x\n", ptr->bus, ptr->slot,
-//     ptr->func,
-//            ptr->class, ptr->subclass, ptr->vendor, ptr->device);
-// }
+#if PRINT_DEBUG_DEVICES
+
+void print_devices_debug(pci_function_t *ptr)
+{
+    kprint("Bus: %x Slot: %x Func: %x Class: %x Subclass: %x Vendor: %x Device: %x\n", ptr->bus, ptr->slot, ptr->func,
+           ptr->class, ptr->subclass, ptr->vendor, ptr->device);
+}
+
+#endif
 
 void init_pci()
 {
     enumerate_pci_slots();
-    // iter_dynll(pci_functions, print_devices_debug);
+#if PRINT_DEBUG_DEVICES
+    iter_dynll(pci_functions, print_devices_debug);
+#endif
 }
 
 void read_pci_bar(pci_function_t *device, uint8_t bar_idx)

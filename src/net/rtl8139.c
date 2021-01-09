@@ -1,3 +1,4 @@
+#include <lib/assert.h>
 #include <lib/kprint.h>
 #include <lib/mem/dynll.h>
 #include <net/rtl8139.h>
@@ -24,7 +25,13 @@ enum rtl_regs
     CONFIG1 = 0x52,
     CR = 0x37,
     RBSTART = 0x30,
+    ISR = 0x3e,
     RCR = 0x44,
+};
+
+enum isr_bits
+{
+    ISR_ROK = 1 << 0,
 };
 
 enum cmd_bits
@@ -45,11 +52,12 @@ enum rx_config_bits
 struct
 {
     uint64_t mac;
-} nic = {0};
+    uint8_t transmit_descriptor;
+} nic = {};
 
 pci_function_t *pci_rtl8139 = 0;
 uint32_t io_offset = 0;
-uint8_t rx_buf[8208] = {0};
+uint8_t rx_buf[8208] = {};
 
 pci_function_t *get_rtl8139()
 {
@@ -62,15 +70,14 @@ pci_function_t *get_rtl8139()
 void rtl_interrupt()
 {
     kprint("epic interrupt for rtl");
+    // recieve on rx ok
+    rtl_ww(ISR, ISR_ROK);
 }
 
 int init_rtl8139()
 {
     pci_rtl8139 = get_rtl8139();
-    if (!pci_rtl8139)
-    {
-        return 1;
-    }
+    assert(pci_rtl8139 != NULL);
     enable_pci_bus_mastering(pci_rtl8139);
     read_pci_bar(pci_rtl8139, 0);
     io_offset = pci_rtl8139->bars[0].addr;
@@ -91,4 +98,11 @@ int init_rtl8139()
     rtl_wd(RCR, RXC_AAP | RXC_AB | RXC_AM | RXC_APM);
     // enable rx and tx
     rtl_wb(CR, CMD_RE | CMD_TE);
+}
+
+void transmit_packet(uint8_t *packet, size_t size)
+{
+    // TODO: verify if packets need to be aligned to dword boundaries
+    // assert((size_t)packet % 4 == 0);
+    assert(size < 0x700);
 }
