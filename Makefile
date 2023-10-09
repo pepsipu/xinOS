@@ -1,8 +1,8 @@
 BUILD=build
-CC=i386-elf-gcc
+CC=gcc
 CFLAGS=-I src -std=gnu99 -ffreestanding -Wall -Wextra -m32 -fno-pic -g -mgeneral-regs-only -mno-red-zone -fno-stack-protector -masm=intel
 AS=nasm
-LD=i386-elf-gcc
+LD=gcc
 LDFLAGS=-T link.ld -ffreestanding -nostdlib -m32
 
 CSOURCES=$(shell find . -type f -iname '*.c')

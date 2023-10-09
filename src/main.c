@@ -1,5 +1,4 @@
 #include <boot/multiboot.h>
-#include <lib/assert.h>
 #include <lib/cmd.h>
 #include <lib/kprint.h>
 #include <lib/mem/mem.h>
